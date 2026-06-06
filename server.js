@@ -41,5 +41,5 @@ app.post('/api/checkout/generate-charge', (req, res) => {
         qr_payload: mockEMVCoString // Passes data string down to change your phone code pixels dynamically
     });
 });
-
+CONFIG.PORT = process.env.PORT || 10000;
 app.listen(CONFIG.PORT, () => console.log(`ShoufKash active on deployment port: ${CONFIG.PORT}`));
