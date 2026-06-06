@@ -1,3 +1,4 @@
+const QRCode = require('qrcode');
 // ShoufKash POS - Secure Cloud Backend Routing Engine
 const express = require('express');
 const cors = require('cors');
@@ -55,25 +56,40 @@ app.post('/api/checkout/generate-charge', (req, res) => {
 });
 
 app.listen(CONFIG.PORT, () => console.log(`ShoufKash active on deployment port: ${CONFIG.PORT}`));
-// --- API Route to Handle ShoufKash POS QR Generation ---
-app.post('/api/generate-qr', function(req, res) {
-    const amount = req.body.amount;
-    console.log("Incoming ShoufKash request for amount:", amount);
+// --- UPGRADED REAL QR CODE GENERATOR API ---
+app.post('/api/generate-qr', async function(req, res) {
+    try {
+        const amount = req.body.amount;
+        console.log("Generating genuine QR handshake for amount:", amount);
 
-    // If no amount was provided by the POS, send a 400 Bad Request error
-    if (!amount || amount <= 0) {
-        return res.status(400).json({ error: "Invalid payment amount" });
+        if (!amount || amount <= 0) {
+            return res.status(400).json({ error: "Invalid payment amount" });
+        }
+
+        // --- ENCODING DATA PAYLOAD ---
+        // This is the string standard your customers' payment scanner will read.
+        // We can bundle merchant name, invoice timestamp, or specific target bank parameters here later.
+        const paymentPayload = `shoufkash://pay?amount=${amount}&currency=MRU&merchant=MauriPay_POS`;
+
+        // Generate the dynamic Base64 Image layout array string automatically
+        const realQrBase64 = await QRCode.toDataURL(paymentPayload, {
+            errorCorrectionLevel: 'H', // High error tolerance for fast phone scans
+            margin: 1,                 // Border thickness padding adjustment
+            color: {
+                dark: '#000000',       // QR Code dots color layer
+                light: '#FFFFFF'       // Background fill canvas layer
+            }
+        });
+
+        // Send payload structure back to the phone app wrapper seamlessly
+        res.json({
+            success: true,
+            amount: amount,
+            qr_image: realQrBase64
+        });
+
+    } catch (error) {
+        console.error("Internal canvas matrix encoding crash:", error);
+        res.status(500).json({ error: "Failed to generate matrix parameters" });
     }
-
-    // For now, we will return a fallback Base64 image payload.
-    // This is a microscopic 1x1 green dot image to prove the connection works.
-    // In the next step, we will replace this with a real QR encoder library!
-    const testBase64Image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
-
-    // Send a successful JSON response back to the phone app
-    res.json({
-        success: true,
-        amount: amount,
-        qr_image: testBase64Image
-    });
 });
