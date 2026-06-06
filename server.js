@@ -2,6 +2,18 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+// --- CRITICAL CORS SAFETY CONFIGURATION ---
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*"); 
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    
+    // Instantly answer preflight requests safely
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());
@@ -41,5 +53,5 @@ app.post('/api/checkout/generate-charge', (req, res) => {
         qr_payload: mockEMVCoString // Passes data string down to change your phone code pixels dynamically
     });
 });
-CONFIG.PORT = process.env.PORT || 10000;
+
 app.listen(CONFIG.PORT, () => console.log(`ShoufKash active on deployment port: ${CONFIG.PORT}`));
