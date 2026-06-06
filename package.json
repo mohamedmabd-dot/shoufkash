@@ -1,18 +1,14 @@
 {
-  "name": "mauripay",
+  "name": "shoufkash-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "ShoufKash POS secure cloud payment routing platform",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "@capacitor/android": "^8.4.0",
-    "@capacitor/cli": "^8.4.0",
-    "@capacitor/core": "^8.4.0"
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
   }
 }
+
