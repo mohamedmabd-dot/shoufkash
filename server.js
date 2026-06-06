@@ -55,3 +55,25 @@ app.post('/api/checkout/generate-charge', (req, res) => {
 });
 
 app.listen(CONFIG.PORT, () => console.log(`ShoufKash active on deployment port: ${CONFIG.PORT}`));
+// --- API Route to Handle ShoufKash POS QR Generation ---
+app.post('/api/generate-qr', function(req, res) {
+    const amount = req.body.amount;
+    console.log("Incoming ShoufKash request for amount:", amount);
+
+    // If no amount was provided by the POS, send a 400 Bad Request error
+    if (!amount || amount <= 0) {
+        return res.status(400).json({ error: "Invalid payment amount" });
+    }
+
+    // For now, we will return a fallback Base64 image payload.
+    // This is a microscopic 1x1 green dot image to prove the connection works.
+    // In the next step, we will replace this with a real QR encoder library!
+    const testBase64Image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+
+    // Send a successful JSON response back to the phone app
+    res.json({
+        success: true,
+        amount: amount,
+        qr_image: testBase64Image
+    });
+});
